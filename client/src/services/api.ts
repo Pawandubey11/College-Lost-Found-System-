@@ -91,7 +91,7 @@ export interface AdminStats {
   recoveryRate: number;
 }
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') ? 'https://college-lost-found-system-cax7.onrender.com/api' : '/api');
 
 async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('token');
