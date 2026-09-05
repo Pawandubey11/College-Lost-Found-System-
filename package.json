@@ -8,6 +8,9 @@
     "start": "cd server && node dist/index.js",
     "seed": "cd server && npm run seed"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "author": "Pawan Dubey",
   "license": "MIT"
 }
