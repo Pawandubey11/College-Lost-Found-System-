@@ -2,6 +2,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
 
 dotenv.config();
 
@@ -121,7 +122,6 @@ function autoSeedIfEmpty() {
   if (userCount > 0) return;
 
   console.log('🌱 Empty database detected. Auto-seeding initial data...');
-  const bcrypt = require('bcryptjs');
 
   const categories = [
     { name: 'ID Cards & Badges', slug: 'id-cards', description: 'Student ID cards, RFID access badges, library cards', icon_name: 'CreditCard' },
