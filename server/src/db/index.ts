@@ -6,8 +6,15 @@ import bcrypt from 'bcryptjs';
 
 dotenv.config();
 
-const dbPath = process.env.DATABASE_PATH || (process.env.NODE_ENV === 'production' ? '/tmp/database.sqlite' : path.resolve(process.cwd(), 'database.sqlite'));
-const db = new Database(dbPath);
+let db: Database.Database;
+
+try {
+  const dbPath = process.env.DATABASE_PATH || (process.env.NODE_ENV === 'production' ? '/tmp/database.sqlite' : path.resolve(process.cwd(), 'database.sqlite'));
+  db = new Database(dbPath);
+} catch (err) {
+  console.warn('⚠️ Disk database open failed, falling back to in-memory database:', err);
+  db = new Database(':memory:');
+}
 
 // Enable Foreign Keys & Write-Ahead Logging safely
 db.pragma('foreign_keys = ON');
