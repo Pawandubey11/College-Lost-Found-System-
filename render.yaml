@@ -3,7 +3,7 @@ services:
     name: College-Lost-Found-System-
     env: node
     buildCommand: cd server && npm install && npm run build && cd ../client && npm install && npm run build
-    startCommand: cd server && npm run seed && node dist/index.js
+    startCommand: cd server && node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
