@@ -11,12 +11,11 @@ let db: any;
 
 try {
   const Database = require('better-sqlite3');
-  const dbPath = process.env.DATABASE_PATH || (process.env.NODE_ENV === 'production' ? '/tmp/database.sqlite' : path.resolve(process.cwd(), 'database.sqlite'));
+  const dbPath = process.env.DATABASE_PATH || path.resolve(process.cwd(), 'database.sqlite');
   db = new Database(dbPath);
   try { db.pragma('foreign_keys = ON'); } catch (e) {}
   try { db.pragma('journal_mode = WAL'); } catch (e) {}
 } catch (err) {
-  console.warn('⚠️ Native better-sqlite3 module unavailable, using stateful memory database engine:', err);
   db = createMemoryFallbackDb();
 }
 
