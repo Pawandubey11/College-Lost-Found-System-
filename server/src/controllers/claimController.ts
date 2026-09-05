@@ -46,7 +46,7 @@ export function submitClaim(req: AuthRequest, res: Response): void {
     }
 
     // Check existing pending claim by user
-    const existingClaim = db.prepare('SELECT id FROM claims WHERE item_id = ? AND claimant_id = ? AND status = "PENDING"').get(itemId, req.user.id);
+    const existingClaim = db.prepare("SELECT id FROM claims WHERE item_id = ? AND claimant_id = ? AND status = 'PENDING'").get(itemId, req.user.id);
     if (existingClaim) {
       res.status(400).json({ error: 'You already have an active pending claim for this item.' });
       return;
@@ -62,7 +62,7 @@ export function submitClaim(req: AuthRequest, res: Response): void {
     const claimId = Number(result.lastInsertRowid);
 
     // Update item status
-    db.prepare('UPDATE items SET status = "CLAIM_PENDING", updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(itemId);
+    db.prepare("UPDATE items SET status = 'CLAIM_PENDING', updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(itemId);
 
     // Notify item reporter (finder)
     db.prepare(`
@@ -89,8 +89,8 @@ export function submitClaim(req: AuthRequest, res: Response): void {
       res.status(400).json({ error: error.errors[0].message });
       return;
     }
-    console.error('submitClaim error:', error);
-    res.status(500).json({ error: 'Failed to submit claim.' });
+    console.error('submitClaim error details:', error);
+    res.status(500).json({ error: (error as Error).message || 'Failed to submit claim.' });
   }
 }
 
@@ -188,7 +188,7 @@ export function processClaimDecision(req: AuthRequest, res: Response): void {
 
     if (decision === 'APPROVED') {
       // Mark item as RETURNED
-      db.prepare('UPDATE items SET status = "RETURNED", updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(claim.item_id);
+      db.prepare("UPDATE items SET status = 'RETURNED', updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(claim.item_id);
 
       // Notify claimant of approval and return instructions
       db.prepare(`
@@ -201,7 +201,7 @@ export function processClaimDecision(req: AuthRequest, res: Response): void {
       );
 
       // Reject all other pending claims on this item
-      db.prepare('UPDATE claims SET status = "REJECTED", admin_notes = "Item returned to verified owner." WHERE item_id = ? AND id != ? AND status = "PENDING"').run(claim.item_id, claimId);
+      db.prepare("UPDATE claims SET status = 'REJECTED', admin_notes = 'Item returned to verified owner.' WHERE item_id = ? AND id != ? AND status = 'PENDING'").run(claim.item_id, claimId);
 
     } else {
       // Notify claimant of rejection
@@ -215,9 +215,9 @@ export function processClaimDecision(req: AuthRequest, res: Response): void {
       );
 
       // Reset item status to ACTIVE if no other pending claims
-      const remainingClaims = db.prepare('SELECT COUNT(*) as count FROM claims WHERE item_id = ? AND status = "PENDING"').get(claim.item_id) as { count: number };
+      const remainingClaims = db.prepare("SELECT COUNT(*) as count FROM claims WHERE item_id = ? AND status = 'PENDING'").get(claim.item_id) as { count: number };
       if (remainingClaims.count === 0) {
-        db.prepare('UPDATE items SET status = "ACTIVE" WHERE id = ?').run(claim.item_id);
+        db.prepare("UPDATE items SET status = 'ACTIVE' WHERE id = ?").run(claim.item_id);
       }
     }
 
