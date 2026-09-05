@@ -18,8 +18,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Initialize Database Schema
-initDatabase();
+// Initialize Database Schema safely
+try {
+  initDatabase();
+} catch (err) {
+  console.error('⚠️ Database initialization warning:', err);
+}
 
 // Middleware
 app.use(cors({

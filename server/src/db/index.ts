@@ -6,12 +6,16 @@ import bcrypt from 'bcryptjs';
 
 dotenv.config();
 
-const dbPath = path.resolve(process.cwd(), 'database.sqlite');
+const dbPath = process.env.DATABASE_PATH || (process.env.NODE_ENV === 'production' ? '/tmp/database.sqlite' : path.resolve(process.cwd(), 'database.sqlite'));
 const db = new Database(dbPath);
 
-// Enable Foreign Keys & Write-Ahead Logging for performance
+// Enable Foreign Keys & Write-Ahead Logging safely
 db.pragma('foreign_keys = ON');
-db.pragma('journal_mode = WAL');
+try {
+  db.pragma('journal_mode = WAL');
+} catch (e) {
+  console.warn('WAL journal mode not supported on current filesystem, using standard mode.');
+}
 
 export function initDatabase() {
   db.exec(`
@@ -186,7 +190,10 @@ function autoSeedIfEmpty() {
 }
 
 // Ensure uploads folder exists
-const uploadsDir = path.resolve(process.cwd(), 'uploads');
+const uploadsDir = process.env.NODE_ENV === 'production' 
+  ? '/tmp/uploads' 
+  : path.resolve(process.cwd(), 'uploads');
+
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
