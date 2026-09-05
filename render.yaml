@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: college-lost-found-system
+    env: node
+    buildCommand: npm run build
+    startCommand: npm run seed && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: super_secret_college_lost_found_jwt_key_2026
