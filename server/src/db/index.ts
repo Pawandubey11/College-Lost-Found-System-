@@ -16,21 +16,138 @@ try {
   try { db.pragma('foreign_keys = ON'); } catch (e) {}
   try { db.pragma('journal_mode = WAL'); } catch (e) {}
 } catch (err) {
-  console.warn('⚠️ Native better-sqlite3 module unavailable, using memory database fallback:', err);
-  try {
-    const Database = require('better-sqlite3');
-    db = new Database(':memory:');
-  } catch (e2) {
-    db = {
-      exec: () => {},
-      pragma: () => {},
-      prepare: () => ({
-        run: () => ({ lastInsertRowid: Date.now(), changes: 1 }),
-        get: () => undefined,
-        all: () => []
-      })
-    };
-  }
+  console.warn('⚠️ Native better-sqlite3 module unavailable, using stateful memory database engine:', err);
+  db = createMemoryFallbackDb();
+}
+
+function createMemoryFallbackDb() {
+  const passwordHash = bcrypt.hashSync('Student@123', 10);
+  const adminPasswordHash = bcrypt.hashSync('Admin@123', 10);
+
+  const users: any[] = [
+    { id: 1, full_name: 'Admin Desk Officer', email: 'admin@college.edu', password_hash: adminPasswordHash, role: 'admin', department: 'Campus Safety & Administration', phone_number: '+91 98765 00001', created_at: '2026-09-01 10:00:00' },
+    { id: 2, full_name: 'Alex Rivera', email: 'alex.student@college.edu', password_hash: passwordHash, role: 'student', department: 'Computer Science', phone_number: '+91 98765 11111', created_at: '2026-09-01 10:00:00' },
+    { id: 3, full_name: 'Priya Sharma', email: 'priya.student@college.edu', password_hash: passwordHash, role: 'student', department: 'Electronics Engineering', phone_number: '+91 98765 22222', created_at: '2026-09-01 10:00:00' },
+    { id: 4, full_name: 'Dr. Rahul Verma', email: 'rahul.staff@college.edu', password_hash: passwordHash, role: 'staff', department: 'Physics Faculty', phone_number: '+91 98765 33333', created_at: '2026-09-01 10:00:00' }
+  ];
+
+  const categories: any[] = [
+    { id: 1, name: 'ID Cards & Badges', slug: 'id-cards', description: 'Student ID cards, RFID access badges, library cards', icon_name: 'CreditCard' },
+    { id: 2, name: 'Electronics & Mobiles', slug: 'electronics', description: 'Phones, laptops, chargers, earphones, power banks', icon_name: 'Smartphone' },
+    { id: 3, name: 'Wallets & Purses', slug: 'wallets', description: 'Wallets, coin purses, card holders, money clips', icon_name: 'Wallet' },
+    { id: 4, name: 'Books & Stationery', slug: 'books-stationery', description: 'Textbooks, lab manuals, notebooks, pens, calculators', icon_name: 'BookOpen' },
+    { id: 5, name: 'Keys & Keychains', slug: 'keys', description: 'Hostel keys, bike keys, car keys, lockers keys', icon_name: 'Key' },
+    { id: 6, name: 'Bags & Backpacks', slug: 'bags', description: 'Backpacks, laptop bags, gym bags, totes', icon_name: 'Briefcase' },
+    { id: 7, name: 'Water Bottles & Flasks', slug: 'bottles', description: 'Steel bottles, thermoses, plastic shakers', icon_name: 'Droplet' },
+    { id: 8, name: 'Eyewear & Watches', slug: 'eyewear-watches', description: 'Spectacles, sunglasses, wristwatches, smartwatches', icon_name: 'Glasses' },
+    { id: 9, name: 'Clothing & Apparel', slug: 'clothing', description: 'Jackets, hoodies, lab coats, sports jerseys, caps', icon_name: 'Shirt' },
+    { id: 10, name: 'Documents & Certificates', slug: 'documents', description: 'Files, marksheets, project reports, certificates', icon_name: 'FileText' }
+  ];
+
+  const locations: any[] = [
+    { id: 1, campus_zone: 'Academic Zone', building_name: 'Central Library', floor_level: '2nd Floor Reading Room', description: 'Quiet study area near reference desk' },
+    { id: 2, campus_zone: 'Student Activity Zone', building_name: 'Main Canteen & Food Court', floor_level: 'Ground Floor', description: 'Dining tables near counter #3' },
+    { id: 3, campus_zone: 'Academic Zone', building_name: 'Science & Engineering Block', floor_level: '1st Floor Lab 104', description: 'Computer lab workstation area' },
+    { id: 4, campus_zone: 'Administrative Zone', building_name: 'Admin Building & Reception', floor_level: 'Ground Floor Lobby', description: 'Visitor waiting desk near main security' },
+    { id: 5, campus_zone: 'Sports & Amenities', building_name: 'Indoor Sports Complex', floor_level: 'Badminton Courts', description: 'Seating benches behind court 2' },
+    { id: 6, campus_zone: 'Residential Zone', building: 'Hostel Block A', floor_level: 'Common Room', description: 'TV lounge area' },
+    { id: 7, campus_zone: 'Campus Grounds', building_name: 'Main Entrance Security Gate', floor_level: 'Gate Guard House', description: 'Lost & Found physical drop desk' }
+  ];
+
+  const items: any[] = [
+    {
+      id: 1, report_type: 'LOST', title: 'Black Leather Wallet with College ID', category_id: 3, location_id: 1, description: 'Lost my dark brown/black leather wallet somewhere in 2nd floor reading hall. Contains student ID card for Alex Rivera.', incident_date: '2026-09-03', incident_time: '14:30', primary_color: 'Black', brand: 'WildHorn', distinguishing_features: 'Small silver metal logo on front bottom corner', hidden_details: 'Contains a 10 rupee coin and metro card ending in 4092', status: 'POSSIBLE_MATCH', reporter_id: 2, created_at: '2026-09-03 14:30:00',
+      category_name: 'Wallets & Purses', category_icon: 'Wallet', campus_zone: 'Academic Zone', building_name: 'Central Library', floor_level: '2nd Floor Reading Room', reporter_name: 'Alex Rivera', reporter_role: 'student', reporter_department: 'Computer Science'
+    },
+    {
+      id: 2, report_type: 'FOUND', title: 'Black Leather Wallet found near Library desk', category_id: 3, location_id: 1, description: 'Found a black leather wallet on table 14 in Central Library study room. Handed to librarian desk.', incident_date: '2026-09-03', incident_time: '15:10', primary_color: 'Black', brand: 'WildHorn', distinguishing_features: 'Has a small silver logo on corner and cards inside', hidden_details: 'Student ID belongs to Computer Science student and metro card inside', status: 'POSSIBLE_MATCH', reporter_id: 3, created_at: '2026-09-03 15:10:00',
+      category_name: 'Wallets & Purses', category_icon: 'Wallet', campus_zone: 'Academic Zone', building_name: 'Central Library', floor_level: '2nd Floor Reading Room', reporter_name: 'Priya Sharma', reporter_role: 'student', reporter_department: 'Electronics Engineering'
+    },
+    {
+      id: 3, report_type: 'LOST', title: 'Sony Noise Cancelling Headphones (Grey)', category_id: 2, location_id: 2, description: 'Over-ear wireless headphones in black carrying case. Left on canteen table during lunch.', incident_date: '2026-09-04', incident_time: '13:15', primary_color: 'Grey', brand: 'Sony', distinguishing_features: 'Model WH-1000XM4, scratch near left ear-cup hinge', hidden_details: 'Serial number sticker ends with 881C', status: 'ACTIVE', reporter_id: 2, created_at: '2026-09-04 13:15:00',
+      category_name: 'Electronics & Mobiles', category_icon: 'Smartphone', campus_zone: 'Student Activity Zone', building_name: 'Main Canteen & Food Court', floor_level: 'Ground Floor', reporter_name: 'Alex Rivera', reporter_role: 'student', reporter_department: 'Computer Science'
+    },
+    {
+      id: 4, report_type: 'FOUND', title: 'College RFID Access ID Card - Priya Sharma', category_id: 1, location_id: 3, description: 'Found a student ID card near Lab 104 entrance door.', incident_date: '2026-09-05', incident_time: '10:00', primary_color: 'White/Blue', brand: 'Institutional', distinguishing_features: 'Roll number 2024-ECE-042 printed on front', hidden_details: 'Lanyard has a red superhero sticker on badge clip', status: 'ACTIVE', reporter_id: 4, created_at: '2026-09-05 10:00:00',
+      category_name: 'ID Cards & Badges', category_icon: 'CreditCard', campus_zone: 'Academic Zone', building_name: 'Science & Engineering Block', floor_level: '1st Floor Lab 104', reporter_name: 'Dr. Rahul Verma', reporter_role: 'staff', reporter_department: 'Physics Faculty'
+    }
+  ];
+
+  const claims: any[] = [];
+  const matches: any[] = [{ id: 1, lost_item_id: 1, found_item_id: 2, match_score: 92, status: 'SUGGESTED', detected_at: '2026-09-03 15:15:00' }];
+  const notifications: any[] = [
+    { id: 1, user_id: 2, title: 'Possible Match Found!', message: 'A found report matching your Black Leather Wallet was logged.', type: 'MATCH', reference_id: 2, is_read: 0, created_at: '2026-09-03 15:15:00' }
+  ];
+  const audit_logs: any[] = [
+    { id: 1, user_id: 1, action: 'DATABASE_SEED', target_type: 'SYSTEM', target_id: 0, details: 'In-memory stateful database initialized.', created_at: '2026-09-05 00:00:00' }
+  ];
+
+  return {
+    exec: (sql: string) => {},
+    pragma: (sql: string) => {},
+    prepare: (sql: string) => ({
+      run: (...params: any[]) => {
+        if (sql.includes('INSERT INTO users')) {
+          const newUser = { id: users.length + 1, full_name: params[0], email: params[1], password_hash: params[2], role: params[3], department: params[4], phone_number: params[5], created_at: new Date().toISOString() };
+          users.push(newUser);
+          return { lastInsertRowid: newUser.id, changes: 1 };
+        }
+        if (sql.includes('INSERT INTO items')) {
+          const newItem: Record<string, any> = { id: items.length + 1, report_type: params[0], title: params[1], category_id: params[2], location_id: params[3], description: params[4], incident_date: params[5], incident_time: params[6], primary_color: params[7], brand: params[8], distinguishing_features: params[9], hidden_details: params[10], status: params[11], reporter_id: params[12], created_at: new Date().toISOString() };
+          const cat = categories.find(c => c.id === Number(params[2]));
+          const loc = locations.find(l => l.id === Number(params[3]));
+          const rep = users.find(u => u.id === Number(params[12]));
+          if (cat) { newItem.category_name = cat.name; newItem.category_icon = cat.icon_name; }
+          if (loc) { newItem.campus_zone = loc.campus_zone; newItem.building_name = loc.building_name; newItem.floor_level = loc.floor_level; }
+          if (rep) { newItem.reporter_name = rep.full_name; newItem.reporter_role = rep.role; newItem.reporter_department = rep.department; }
+          items.unshift(newItem);
+          return { lastInsertRowid: newItem.id, changes: 1 };
+        }
+        if (sql.includes('INSERT INTO claims')) {
+          const newClaim = { id: claims.length + 1, item_id: params[0], claimant_id: params[1], verification_answers_json: params[2], status: 'PENDING', created_at: new Date().toISOString() };
+          claims.unshift(newClaim);
+          return { lastInsertRowid: newClaim.id, changes: 1 };
+        }
+        if (sql.includes('UPDATE notifications')) {
+          notifications.forEach(n => n.is_read = 1);
+          return { changes: notifications.length };
+        }
+        return { lastInsertRowid: Date.now(), changes: 1 };
+      },
+      get: (...params: any[]) => {
+        if (sql.includes('FROM users WHERE email =')) {
+          const email = String(params[0]).toLowerCase();
+          return users.find(u => u.email.toLowerCase() === email);
+        }
+        if (sql.includes('FROM users WHERE id =')) {
+          const id = Number(params[0]);
+          return users.find(u => u.id === id);
+        }
+        if (sql.includes('FROM items WHERE id =')) {
+          const id = Number(params[0]);
+          return items.find(i => i.id === id);
+        }
+        if (sql.includes('COUNT(*)')) {
+          if (sql.includes('users')) return { count: users.length, c: users.length };
+          if (sql.includes('items')) return { count: items.length, c: items.length };
+          if (sql.includes('claims')) return { count: claims.length, c: claims.length };
+          if (sql.includes('notifications')) return { count: notifications.filter(n => !n.is_read).length, c: notifications.filter(n => !n.is_read).length };
+          return { count: 0, c: 0 };
+        }
+        return undefined;
+      },
+      all: (...params: any[]) => {
+        if (sql.includes('categories')) return categories;
+        if (sql.includes('locations')) return locations;
+        if (sql.includes('items')) return items;
+        if (sql.includes('claims')) return claims;
+        if (sql.includes('users')) return users;
+        if (sql.includes('notifications')) return notifications;
+        if (sql.includes('audit_logs')) return audit_logs;
+        return [];
+      }
+    })
+  };
 }
 
 export function initDatabase() {
