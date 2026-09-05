@@ -4,18 +4,10 @@
   "description": "Smart College Lost & Found System - Full Stack Academic Mini Project",
   "main": "server/dist/index.js",
   "scripts": {
-    "postinstall": "npm install --prefix server && npm install --prefix client",
-    "build": "npm run build --prefix server && npm run build --prefix client",
-    "start": "node server/dist/index.js",
-    "seed": "npm run seed --prefix server"
+    "build": "cd server && npm install && npm run build && cd ../client && npm install && npm run build",
+    "start": "cd server && node dist/index.js",
+    "seed": "cd server && npm run seed"
   },
-  "keywords": [
-    "lost-and-found",
-    "college-project",
-    "react",
-    "express",
-    "sqlite"
-  ],
   "author": "Pawan Dubey",
   "license": "MIT"
 }

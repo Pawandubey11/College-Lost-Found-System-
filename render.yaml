@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: college-lost-found-system
+    name: College-Lost-Found-System-
     env: node
-    buildCommand: npm run build
-    startCommand: npm run seed && npm start
+    buildCommand: cd server && npm install && npm run build && cd ../client && npm install && npm run build
+    startCommand: cd server && npm run seed && node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production

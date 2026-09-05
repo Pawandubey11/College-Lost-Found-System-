@@ -78,8 +78,9 @@ if (fs.existsSync(clientDistPath)) {
 }
 
 // Start Server
-app.listen(PORT, () => {
-  console.log(`Smart College Lost & Found Server running on http://localhost:${PORT}`);
+const serverPort = Number(PORT) || 5000;
+app.listen(serverPort, '0.0.0.0', () => {
+  console.log(`Smart College Lost & Found Server running on port ${serverPort}`);
 });
 
 export default app;
