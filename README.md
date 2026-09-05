@@ -25,7 +25,7 @@ The **Smart College Lost & Found System** solves these challenges by providing:
 
 ## 🔗 Live Links & Credentials
 
-- **Live Shareable URL**: [https://2ba51b0605a4f5.lhr.life](https://2ba51b0605a4f5.lhr.life)
+- **Live Shareable URL**: [https://b751c7b44ce533.lhr.life](https://b751c7b44ce533.lhr.life)
 - **GitHub Repository**: [https://github.com/Pawandubey11/College-Lost-Found-System-](https://github.com/Pawandubey11/College-Lost-Found-System-)
 
 ### Demo Test Credentials for Viva & Grading
